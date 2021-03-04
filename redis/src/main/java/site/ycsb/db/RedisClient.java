@@ -24,16 +24,15 @@
 
 package site.ycsb.db;
 
+import redis.clients.jedis.commands.BasicCommands;
 import site.ycsb.ByteIterator;
 import site.ycsb.DB;
 import site.ycsb.DBException;
 import site.ycsb.Status;
 import site.ycsb.StringByteIterator;
-import redis.clients.jedis.BasicCommands;
 import redis.clients.jedis.HostAndPort;
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisCluster;
-import redis.clients.jedis.JedisCommands;
 import redis.clients.jedis.Protocol;
 
 import java.io.Closeable;
@@ -54,7 +53,7 @@ import java.util.Vector;
  */
 public class RedisClient extends DB {
 
-  private JedisCommands jedis;
+  private Jedis jedis;
 
   public static final String HOST_PROPERTY = "redis.host";
   public static final String PORT_PROPERTY = "redis.port";
@@ -88,12 +87,12 @@ public class RedisClient extends DB {
       } else {
         jedis = new Jedis(host, port);
       }
-      ((Jedis) jedis).connect();
+      jedis.connect();
     }
 
     String password = props.getProperty(PASSWORD_PROPERTY);
     if (password != null) {
-      ((BasicCommands) jedis).auth(password);
+      jedis.auth(password);
     }
   }
 
@@ -124,7 +123,7 @@ public class RedisClient extends DB {
       StringByteIterator.putAllAsByteIterators(result, jedis.hgetAll(key));
     } else {
       String[] fieldArray =
-          (String[]) fields.toArray(new String[fields.size()]);
+          fields.toArray(new String[fields.size()]);
       List<String> values = jedis.hmget(key, fieldArray);
 
       Iterator<String> fieldIterator = fields.iterator();
@@ -171,7 +170,7 @@ public class RedisClient extends DB {
 
     HashMap<String, ByteIterator> values;
     for (String key : keys) {
-      values = new HashMap<String, ByteIterator>();
+      values = new HashMap<>();
       read(table, key, fields, values);
       result.add(values);
     }

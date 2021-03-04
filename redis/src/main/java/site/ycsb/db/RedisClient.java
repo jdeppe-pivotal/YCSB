@@ -24,14 +24,12 @@
 
 package site.ycsb.db;
 
-import redis.clients.jedis.commands.BasicCommands;
 import site.ycsb.ByteIterator;
 import site.ycsb.DB;
 import site.ycsb.DBException;
 import site.ycsb.Status;
 import site.ycsb.StringByteIterator;
 import redis.clients.jedis.HostAndPort;
-import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisCluster;
 import redis.clients.jedis.Protocol;
 
@@ -53,7 +51,7 @@ import java.util.Vector;
  */
 public class RedisClient extends DB {
 
-  private Jedis jedis;
+  private JedisCluster jedis;
 
   public static final String HOST_PROPERTY = "redis.host";
   public static final String PORT_PROPERTY = "redis.port";
@@ -80,20 +78,20 @@ public class RedisClient extends DB {
       Set<HostAndPort> jedisClusterNodes = new HashSet<>();
       jedisClusterNodes.add(new HostAndPort(host, port));
       jedis = new JedisCluster(jedisClusterNodes);
-    } else {
-      String redisTimeout = props.getProperty(TIMEOUT_PROPERTY);
-      if (redisTimeout != null){
-        jedis = new Jedis(host, port, Integer.parseInt(redisTimeout));
-      } else {
-        jedis = new Jedis(host, port);
-      }
-      jedis.connect();
+    // } else {
+    //   String redisTimeout = props.getProperty(TIMEOUT_PROPERTY);
+    //   if (redisTimeout != null){
+    //     jedis = new Jedis(host, port, Integer.parseInt(redisTimeout));
+    //   } else {
+    //     jedis = new Jedis(host, port);
+    //   }
+    //   jedis.connect();
     }
 
-    String password = props.getProperty(PASSWORD_PROPERTY);
-    if (password != null) {
-      jedis.auth(password);
-    }
+    // String password = props.getProperty(PASSWORD_PROPERTY);
+    // if (password != null) {
+    //   jedis.auth(password);
+    // }
   }
 
   public void cleanup() throws DBException {
